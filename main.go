@@ -7,6 +7,8 @@ import (
 	"net"
 	"os"
 
+	"strings"
+
 	"golang.org/x/crypto/ssh"
 )
 
@@ -35,6 +37,7 @@ func makeSshConfig(user, password string) (*ssh.ClientConfig, error) {
 			ssh.PublicKeys(key),
 			ssh.Password(password),
 		},
+		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
 	}
 
 	return &config, nil
@@ -58,7 +61,7 @@ func handleClient(client net.Conn, remote net.Conn) {
 	// Start local -> remote data transfer
 	go func() {
 		_, err := io.Copy(remote, client)
-		if err != nil {
+		if err != nil && !strings.Contains(err.Error(), "use of closed network connection") {
 			log.Println(err)
 		}
 		chDone <- true
@@ -72,31 +75,25 @@ func main() {
 	//sshAddr := "remote_ip:22"
 	sshAddr := "localhost:22"
 	localAddr := "127.0.0.1:5000"
-	remoteAddr := "127.0.0.1:8080"
+	remoteAddr := "127.0.0.1:8000"
 
 	// Build SSH client configuration
-	cfg, err := makeSshConfig("user", "password")
+	cfg, err := makeSshConfig(os.Getenv("USER"), "password")
 	if err != nil {
-		log.Fatalln(err)
+		panic(err)
 	}
 
 	// Establish connection with SSH server
 	conn, err := ssh.Dial("tcp", sshAddr, cfg)
 	if err != nil {
-		log.Fatalln(err)
+		panic(err)
 	}
 	defer conn.Close()
-
-	// Establish connection with remote server
-	remote, err := conn.Dial("tcp", remoteAddr)
-	if err != nil {
-		log.Fatalln(err)
-	}
 
 	// Start local server to forward traffic to remote connection
 	local, err := net.Listen("tcp", localAddr)
 	if err != nil {
-		log.Fatalln(err)
+		panic(err)
 	}
 	defer local.Close()
 
@@ -104,7 +101,13 @@ func main() {
 	for {
 		client, err := local.Accept()
 		if err != nil {
-			log.Fatalln(err)
+			panic(err)
+		}
+
+		// Establish connection with remote server
+		remote, err := conn.Dial("tcp", remoteAddr)
+		if err != nil {
+			panic(err)
 		}
 
 		handleClient(client, remote)
