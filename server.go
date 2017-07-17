@@ -28,7 +28,5 @@ func (s Server) Start() {
 		return c.String(http.StatusOK, "GET rule! :"+c.Param("id"))
 	})
 
-	go func() {
-		e.Logger.Fatal(e.Start("127.0.0.1:8080"))
-	}()
+	e.Logger.Fatal(e.Start("127.0.0.1:8080"))
 }
