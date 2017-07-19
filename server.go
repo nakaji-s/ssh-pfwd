@@ -16,10 +16,16 @@ func (s Server) Start() {
 		return c.String(http.StatusOK, "Hello, World!")
 	})
 	e.PUT("/rule", func(c echo.Context) error {
-		return c.String(http.StatusOK, "Add rule!")
+		rule := new(Rule)
+		if err := c.Bind(rule); err != nil {
+			return err
+		}
+		s.Config.AddRule(*rule)
+		return c.JSON(http.StatusOK, rule)
 	})
-	e.GET("/rule", func(c echo.Context) error {
-		return c.String(http.StatusOK, "GET rules!")
+	e.GET("/rules", func(c echo.Context) error {
+		//return c.String(http.StatusOK, "GET rules!")
+		return c.JSON(http.StatusOK, s.Config.Rules)
 	})
 	e.DELETE("/rule/:id", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Delete rule! :"+c.Param("id"))
