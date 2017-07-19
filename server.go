@@ -24,14 +24,19 @@ func (s Server) Start() {
 		return c.JSON(http.StatusOK, rule)
 	})
 	e.GET("/rules", func(c echo.Context) error {
-		//return c.String(http.StatusOK, "GET rules!")
 		return c.JSON(http.StatusOK, s.Config.Rules)
 	})
 	e.DELETE("/rule/:id", func(c echo.Context) error {
-		return c.String(http.StatusOK, "Delete rule! :"+c.Param("id"))
+		s.Config.DeleteRule(c.Param("id"))
+		return c.JSON(http.StatusOK, struct{}{})
 	})
 	e.GET("/rule/:id", func(c echo.Context) error {
-		return c.String(http.StatusOK, "GET rule! :"+c.Param("id"))
+		for _, rule := range s.Config.Rules {
+			if rule.Id == c.Param("id") {
+				return c.JSON(http.StatusOK, rule)
+			}
+		}
+		return c.JSON(http.StatusNotFound, struct{}{})
 	})
 
 	e.Logger.Fatal(e.Start("127.0.0.1:8080"))
