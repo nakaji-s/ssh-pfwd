@@ -4,13 +4,12 @@
 new Vue({
     el: '#app',
     data: {
-        results: []
     },
     methods: {
         gets() {
             axios.get("/rules").then((response) => {
-                console(response.data)
-                this.results = response.data.results;
+                console.log(response.data)
+                console.log(response.data[0].Priority)
             }).catch((error) => { console.log(error); });
         }
     }
