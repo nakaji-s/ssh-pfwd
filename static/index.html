@@ -2,18 +2,52 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="foundation.min.css">
+    <link rel="stylesheet" href="theme-default/index.css">
     <title>Title</title>
 </head>
 <body>
 
-<div class="container" id="app">
-    <div class="medium-4 columns">
-        <a @click="gets()" class="button expanded">Retrieve</a>
-    </div>
+
+<div id="app">
+    <el-button @click="gets()">Retrieve</el-button>
+
+    <el-button @click="visible = true">Button</el-button>
+    <el-dialog v-model="visible" title="Hello world">
+        <p>Try Element</p>
+    </el-dialog>
+
+    <el-row>
+        <el-col :span="24">
+            <el-menu theme="dark" default-active="1" class="el-menu-demo" mode="horizontal">
+                <el-menu-item index="1">Processing Center</el-menu-item>
+                <el-submenu index="2">
+                    <template slot="title">Workspace</template>
+                    <el-menu-item index="2-1">item one</el-menu-item>
+                </el-submenu>
+                <el-menu-item index="3">Orders</el-menu-item>
+            </el-menu>
+        </el-col>
+    </el-row>
+    <el-row>
+        <el-col :span="12">
+            <div class="grid-content">
+                <div class="block">
+                  <span class="wrapper">
+                    <el-button type="success">Success</el-button>
+                    <el-button type="warning">Warning</el-button>
+                    <el-button type="danger">Danger</el-button>
+                    <el-button type="info">Info</el-button>
+                  </span>
+                </div>
+            </div>
+        </el-col>
+    </el-row>
 </div>
+
+</body>
 <script src="axios.min.js"></script>
 <script src="vue.js"></script>
+<script src="element-ui.js"></script>
 <script src="app.js"></script>
-</body>
+
 </html>

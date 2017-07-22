@@ -1,6 +1,3 @@
-/**
- * Created by penguin on 2017/07/21.
- */
 new Vue({
     el: '#app',
     data: {
@@ -12,5 +9,8 @@ new Vue({
                 console.log(response.data[0].Priority)
             }).catch((error) => { console.log(error); });
         }
+    },
+    data: function() {
+        return { visible: false }
     }
 });

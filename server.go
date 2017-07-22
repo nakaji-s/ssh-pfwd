@@ -14,9 +14,11 @@ func (s Server) Start() {
 	e := echo.New()
 	e.File("/", "ssh-pfwd/static/index.html")
 	e.File("/vue.js", "ssh-pfwd/static/vue.js")
+	e.File("/element-ui.js", "ssh-pfwd/static/element-ui.js")
 	e.File("/app.js", "ssh-pfwd/static/app.js")
 	e.File("/axios.min.js", "ssh-pfwd/static/axios.min.js")
 	e.File("/foundation.min.css", "ssh-pfwd/static/foundation.min.css")
+	e.Static("/theme-default", "ssh-pfwd/static/theme-default")
 
 	e.PUT("/rule", func(c echo.Context) error {
 		rule := new(Rule)
