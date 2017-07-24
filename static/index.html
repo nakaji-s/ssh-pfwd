@@ -49,25 +49,19 @@
                 border
                 style="width: 100%">
             <el-table-column
-                    label="Date"
+                    label="LocalAddr"
+                    prop="LocalAddr"
                     width="180">
-                <template scope="scope">
-                    <el-icon name="time"></el-icon>
-                    <span style="margin-left: 10px">{{ scope.row.date }}</span>
-                </template>
             </el-table-column>
             <el-table-column
-                    label="Name"
+                    label="SSHAddr"
+                    prop="SshAddr"
                     width="180">
-                <template scope="scope">
-                    <el-popover trigger="hover" placement="top">
-                        <p>Name: {{ scope.row.name }}</p>
-                        <p>Addr: {{ scope.row.address }}</p>
-                        <div slot="reference" class="name-wrapper">
-                            <el-tag>{{ scope.row.name }}</el-tag>
-                        </div>
-                    </el-popover>
-                </template>
+            </el-table-column>
+            <el-table-column
+                    label="RemoteAddr"
+                    prop="RemoteAddr"
+                    width="180">
             </el-table-column>
             <el-table-column
                     label="Operations">
