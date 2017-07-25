@@ -12,6 +12,10 @@ new Vue({
         },
         handleDelete(index, row) {
             console.log(index, row);
+            axios.delete("/rule/"+row.Id).then((response) => {
+                console.log(response.data)
+                this.gets()
+            }).catch((error) => { console.log(error); });
         }
     },
     data: function() {

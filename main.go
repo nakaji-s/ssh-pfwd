@@ -1,5 +1,7 @@
 package main
 
+import "github.com/satori/go.uuid"
+
 func main() {
 	// Connection settings
 	//sshAddr := "remote_ip:22"
@@ -8,7 +10,7 @@ func main() {
 	remoteAddr := "127.0.0.1:8000"
 
 	config := Config{}
-	rule := Rule{SshAddr: sshAddr, LocalAddr: localAddr, RemoteAddr: remoteAddr}
+	rule := Rule{Id: uuid.NewV4().String(), SshAddr: sshAddr, LocalAddr: localAddr, RemoteAddr: remoteAddr}
 	config.AddRule(rule)
 
 	server := Server{config}
