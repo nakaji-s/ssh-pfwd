@@ -8,7 +8,7 @@ new Vue({
             }).catch((error) => { console.log(error); });
         },
         put() {
-            axios.put("/rule", this.$data.form).then((response) => {
+            axios.post("/rule", this.$data.form).then((response) => {
                 console.log(response.data)
                 this.gets()
             }).catch((error) => { console.log(error); });

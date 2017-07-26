@@ -17,7 +17,7 @@ func (s Server) Start() {
 	e.File("/app.js", "ssh-pfwd/static/app.js")
 	e.Static("/lib", "ssh-pfwd/static/lib")
 
-	e.PUT("/rule", func(c echo.Context) error {
+	e.POST("/rule", func(c echo.Context) error {
 		rule := new(Rule)
 		if err := c.Bind(rule); err != nil {
 			return err
