@@ -30,7 +30,9 @@ func (s Server) Start() {
 		return c.JSON(http.StatusOK, s.Config.Rules)
 	})
 	e.DELETE("/rule/:id", func(c echo.Context) error {
-		s.Config.DeleteRule(c.Param("id"))
+		if err := s.Config.DeleteRule(c.Param("id")); err != nil {
+			return err
+		}
 		return c.JSON(http.StatusOK, struct{}{})
 	})
 	e.GET("/rule/:id", func(c echo.Context) error {
