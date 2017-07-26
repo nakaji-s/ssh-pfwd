@@ -7,6 +7,12 @@ new Vue({
                 Vue.set(this, "tableData", response.data)
             }).catch((error) => { console.log(error); });
         },
+        put() {
+            axios.put("/rule", this.$data.form).then((response) => {
+                console.log(response.data)
+                this.gets()
+            }).catch((error) => { console.log(error); });
+        },
         handleEdit(index, row) {
             console.log(index, row);
         },
@@ -16,12 +22,21 @@ new Vue({
                 console.log(response.data)
                 this.gets()
             }).catch((error) => { console.log(error); });
+        },
+        dialogFormVisibleClean() {
+            Vue.set(this, "form", {})
         }
     },
     data: function() {
         return {
             tableData: [],
-            visible: false
+            dialogFormVisible: false,
+            form: {
+                localaddr: '',
+                sshaddr: '',
+                remoteaddr: ''
+              },
+            formLabelWidth: '120px'
         }
     },
     created: function() {

@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo"
+	"github.com/satori/go.uuid"
 )
 
 type Server struct {
@@ -21,6 +22,7 @@ func (s Server) Start() {
 		if err := c.Bind(rule); err != nil {
 			return err
 		}
+		rule.Id = uuid.NewV4().String()
 		s.Config.AddRule(*rule)
 		return c.JSON(http.StatusOK, rule)
 	})
