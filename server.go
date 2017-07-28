@@ -43,6 +43,17 @@ func (s Server) Start() {
 		}
 		return c.JSON(http.StatusNotFound, struct{}{})
 	})
+	e.PUT("/rule/:id", func(c echo.Context) error {
+		for i, _ := range s.Config.Rules {
+			if s.Config.Rules[i].Id == c.Param("id") {
+				if err := c.Bind(&s.Config.Rules[i]); err != nil {
+					return err
+				}
+				return c.JSON(http.StatusOK, s.Config.Rules[i])
+			}
+		}
+		return c.JSON(http.StatusNotFound, struct{}{})
+	})
 
 	e.Logger.Fatal(e.Start("127.0.0.1:8080"))
 }

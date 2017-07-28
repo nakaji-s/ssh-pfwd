@@ -63,7 +63,7 @@
                 <template scope="scope">
                     <el-button
                             size="small"
-                            @click="handleEdit(scope.$index, scope.row)">Edit</el-button>
+                            @click="get(scope.row.Id); targetId = scope.row.Id; dialogFormVisibleUpdate = true">Edit</el-button>
                     <el-button
                             size="small"
                             type="danger"
@@ -79,19 +79,37 @@
     <el-dialog title="Portforwarding Rule" :visible.sync="dialogFormVisible">
         <el-form :model="form">
             <el-form-item label="LocalAddr" :label-width="formLabelWidth">
-                <el-input v-model="form.localaddr" auto-complete="off"></el-input>
+                <el-input v-model="form.LocalAddr" auto-complete="off"></el-input>
             </el-form-item>
             <el-form-item label="SSHAddr" :label-width="formLabelWidth">
-                <el-input v-model="form.sshaddr" auto-complete="off"></el-input>
+                <el-input v-model="form.SshAddr" auto-complete="off"></el-input>
             </el-form-item>
             <el-form-item label="RemoteAddr" :label-width="formLabelWidth">
-                <el-input v-model="form.remoteaddr" auto-complete="off"></el-input>
+                <el-input v-model="form.RemoteAddr" auto-complete="off"></el-input>
             </el-form-item>
         </el-form>
         <span slot="footer" class="dialog-footer">
-    <el-button @click="dialogFormVisible = false">Cancel</el-button>
-    <el-button type="primary" @click="dialogFormVisible = false; put()">OK</el-button>
-  </span>
+            <el-button @click="dialogFormVisible = false">Cancel</el-button>
+            <el-button type="primary" @click="dialogFormVisible = false; post()">OK</el-button>
+        </span>
+    </el-dialog>
+
+    <el-dialog title="Portforwarding Rule" :visible.sync="dialogFormVisibleUpdate">
+        <el-form :model="form">
+            <el-form-item label="LocalAddr" :label-width="formLabelWidth">
+                <el-input v-model="form.LocalAddr" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="SSHAddr" :label-width="formLabelWidth">
+                <el-input v-model="form.SshAddr" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="RemoteAddr" :label-width="formLabelWidth">
+                <el-input v-model="form.RemoteAddr" auto-complete="off"></el-input>
+            </el-form-item>
+        </el-form>
+        <span slot="footer" class="dialog-footer">
+            <el-button @click="dialogFormVisibleUpdate = false">Cancel</el-button>
+            <el-button type="primary" @click="dialogFormVisibleUpdate = false; put(targetId)">OK</el-button>
+        </span>
     </el-dialog>
 </div>
 
