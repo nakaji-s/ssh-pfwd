@@ -24,7 +24,7 @@ func (s Server) Start() {
 		}
 		rule.Id = uuid.NewV4().String()
 		s.Config.AddRule(*rule)
-		return c.JSON(http.StatusOK, rule)
+		return c.JSON(http.StatusCreated, rule)
 	})
 	e.GET("/rules", func(c echo.Context) error {
 		return c.JSON(http.StatusOK, s.Config.Rules)
