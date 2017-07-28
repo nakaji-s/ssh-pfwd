@@ -8,6 +8,7 @@ type Rule struct {
 	Id       string
 	Priority int
 	IsLocal  bool
+	Enable   bool
 	SSHPortForward
 }
 

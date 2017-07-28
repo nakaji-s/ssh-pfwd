@@ -44,6 +44,18 @@
                 border
                 style="width: 100%">
             <el-table-column
+                    label=""
+                    width="80">
+                <template scope="scope">
+                    <el-switch
+                            v-model="tableData[scope.$index].Enable"
+                            on-color="#13ce66"
+                            off-color="#ff4949"
+                            @change="change(scope.row.Id, scope.$index)">
+                    </el-switch>
+                </template>
+            </el-table-column>
+            <el-table-column
                     label="LocalAddr"
                     prop="LocalAddr"
                     width="180">

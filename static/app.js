@@ -25,6 +25,12 @@ new Vue({
                 this.gets()
             }).catch((error) => { console.log(error); });
         },
+        change(id, index) {
+            axios.put("/rule/"+id, {Enable: !this.$data.tableData[index].Enable}).then((response) => {
+                console.log(response.data)
+                this.gets()
+            }).catch((error) => { console.log(error); });
+        },
         handleDelete(index, row) {
             console.log(index, row);
             axios.delete("/rule/"+row.Id).then((response) => {
