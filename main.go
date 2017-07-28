@@ -10,7 +10,7 @@ func main() {
 	remoteAddr := "127.0.0.1:8000"
 
 	config := Config{}
-	rule := Rule{Id: uuid.NewV4().String(), SshAddr: sshAddr, LocalAddr: localAddr, RemoteAddr: remoteAddr}
+	rule := Rule{Id: uuid.NewV4().String(), SSHPortForward: SSHPortForward{SshAddr: sshAddr, LocalAddr: localAddr, RemoteAddr: remoteAddr}}
 	config.AddRule(rule)
 
 	server := Server{config}
@@ -18,7 +18,7 @@ func main() {
 		server.Start()
 	}()
 
-	pfwd := SSHPortForward{SshAddr: sshAddr, LocalAddr: localAddr, RemoteAddr: remoteAddr}
+	pfwd := rule.SSHPortForward
 	go func() {
 		pfwd.Handle()
 	}()

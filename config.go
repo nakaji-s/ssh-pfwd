@@ -5,12 +5,10 @@ import (
 )
 
 type Rule struct {
-	Id         string
-	Priority   int
-	SshAddr    string
-	LocalAddr  string
-	RemoteAddr string
-	IsLocal    bool
+	Id       string
+	Priority int
+	IsLocal  bool
+	SSHPortForward
 }
 
 type Config struct {
