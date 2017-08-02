@@ -55,5 +55,7 @@ func (s Server) Start() {
 		return c.JSON(http.StatusNotFound, struct{}{})
 	})
 
+	// TODO CRUD for key
+
 	e.Logger.Fatal(e.Start("127.0.0.1:8080"))
 }
