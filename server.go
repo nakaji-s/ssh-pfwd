@@ -27,32 +27,31 @@ func (s Server) Start() {
 		return c.JSON(http.StatusCreated, rule)
 	})
 	e.GET("/rules", func(c echo.Context) error {
-		return c.JSON(http.StatusOK, s.Config.Rules)
+		return c.JSON(http.StatusOK, s.Config.GetRules())
 	})
 	e.DELETE("/rule/:id", func(c echo.Context) error {
 		if err := s.Config.DeleteRule(c.Param("id")); err != nil {
-			return err
+			return c.JSON(http.StatusNotFound, struct{}{})
 		}
 		return c.JSON(http.StatusOK, struct{}{})
 	})
 	e.GET("/rule/:id", func(c echo.Context) error {
-		for _, rule := range s.Config.Rules {
-			if rule.Id == c.Param("id") {
-				return c.JSON(http.StatusOK, rule)
-			}
+		rule, err := s.Config.GetRule(c.Param("id"))
+		if err != nil {
+			return c.JSON(http.StatusNotFound, struct{}{})
 		}
-		return c.JSON(http.StatusNotFound, struct{}{})
+		return c.JSON(http.StatusOK, rule)
 	})
 	e.PUT("/rule/:id", func(c echo.Context) error {
-		for i, _ := range s.Config.Rules {
-			if s.Config.Rules[i].Id == c.Param("id") {
-				if err := c.Bind(&s.Config.Rules[i]); err != nil {
-					return err
-				}
-				return c.JSON(http.StatusOK, s.Config.Rules[i])
-			}
+		rule := new(Rule)
+		if err := c.Bind(rule); err != nil {
+			return err
 		}
-		return c.JSON(http.StatusNotFound, struct{}{})
+		updatedRule, err := s.Config.UpdateRule(c.Param("id"), *rule)
+		if err != nil {
+			return c.JSON(http.StatusNotFound, struct{}{})
+		}
+		return c.JSON(http.StatusOK, updatedRule)
 	})
 
 	// TODO CRUD for key

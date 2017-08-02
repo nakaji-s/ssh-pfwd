@@ -35,3 +35,26 @@ func (c *Config) DeleteRule(id string) error {
 	}
 	return fmt.Errorf("err id(%s) not found", id)
 }
+
+func (c *Config) GetRule(id string) (Rule, error) {
+	for _, rule := range c.Rules {
+		if rule.Id == id {
+			return rule, nil
+		}
+	}
+	return Rule{}, fmt.Errorf("err id(%s) not found", id)
+}
+
+func (c *Config) UpdateRule(id string, newRule Rule) (Rule, error) {
+	for i, _ := range c.Rules {
+		if c.Rules[i].Id == id {
+			c.Rules[i] = newRule
+			return newRule, nil
+		}
+	}
+	return Rule{}, fmt.Errorf("err id(%s) not found", id)
+}
+
+func (c *Config) GetRules() []Rule {
+	return c.Rules
+}
