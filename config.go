@@ -12,11 +12,19 @@ type Rule struct {
 	SSHPortForward
 }
 
-type Config struct {
+type Config interface {
+	AddRule(newRule Rule)
+	DeleteRule(id string) error
+	GetRule(id string) (Rule, error)
+	UpdateRule(id string, newRule Rule) (Rule, error)
+	GetRules() []Rule
+}
+
+type InMemoryConfig struct {
 	Rules []Rule
 }
 
-func (c *Config) AddRule(newRule Rule) {
+func (c *InMemoryConfig) AddRule(newRule Rule) {
 	for i, rule := range c.Rules {
 		if rule.Priority > newRule.Priority {
 			c.Rules = append(c.Rules[:i], append([]Rule{newRule}, c.Rules[i:]...)...)
@@ -26,7 +34,7 @@ func (c *Config) AddRule(newRule Rule) {
 	c.Rules = append(c.Rules, newRule)
 }
 
-func (c *Config) DeleteRule(id string) error {
+func (c *InMemoryConfig) DeleteRule(id string) error {
 	for i, rule := range c.Rules {
 		if rule.Id == id {
 			c.Rules = append(c.Rules[:i], c.Rules[i+1:]...)
@@ -36,7 +44,7 @@ func (c *Config) DeleteRule(id string) error {
 	return fmt.Errorf("err id(%s) not found", id)
 }
 
-func (c *Config) GetRule(id string) (Rule, error) {
+func (c *InMemoryConfig) GetRule(id string) (Rule, error) {
 	for _, rule := range c.Rules {
 		if rule.Id == id {
 			return rule, nil
@@ -45,7 +53,7 @@ func (c *Config) GetRule(id string) (Rule, error) {
 	return Rule{}, fmt.Errorf("err id(%s) not found", id)
 }
 
-func (c *Config) UpdateRule(id string, newRule Rule) (Rule, error) {
+func (c *InMemoryConfig) UpdateRule(id string, newRule Rule) (Rule, error) {
 	for i, _ := range c.Rules {
 		if c.Rules[i].Id == id {
 			c.Rules[i] = newRule
@@ -55,6 +63,6 @@ func (c *Config) UpdateRule(id string, newRule Rule) (Rule, error) {
 	return Rule{}, fmt.Errorf("err id(%s) not found", id)
 }
 
-func (c *Config) GetRules() []Rule {
+func (c *InMemoryConfig) GetRules() []Rule {
 	return c.Rules
 }

@@ -9,11 +9,11 @@ func main() {
 	localAddr := "127.0.0.1:5000"
 	remoteAddr := "127.0.0.1:8000"
 
-	config := Config{}
+	config := InMemoryConfig{}
 	rule := Rule{Enable: true, Id: uuid.NewV4().String(), SSHPortForward: SSHPortForward{SshAddr: sshAddr, LocalAddr: localAddr, RemoteAddr: remoteAddr}}
 	config.AddRule(rule)
 
-	server := Server{config}
+	server := Server{&config}
 	go func() {
 		server.Start()
 	}()
