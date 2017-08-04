@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo"
+	"github.com/labstack/echo/middleware"
 	"github.com/satori/go.uuid"
 )
 
@@ -13,6 +14,14 @@ type Server struct {
 
 func (s Server) Start() {
 	e := echo.New()
+
+	e.Use(middleware.BasicAuth(func(username, password string, c echo.Context) (bool, error) {
+		if username == "admin" && password == "admin" {
+			return true, nil
+		}
+		return false, nil
+	}))
+
 	e.File("/", "ssh-pfwd/static/index.html")
 	e.File("/app.js", "ssh-pfwd/static/app.js")
 	e.Static("/lib", "ssh-pfwd/static/lib")
