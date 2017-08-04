@@ -14,6 +14,7 @@ type Server struct {
 
 func (s Server) Start() {
 	e := echo.New()
+	e.Use(middleware.Logger())
 
 	e.Use(middleware.BasicAuth(func(username, password string, c echo.Context) (bool, error) {
 		if username == "admin" && password == "admin" {
