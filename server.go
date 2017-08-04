@@ -5,6 +5,7 @@ import (
 
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
+	"github.com/labstack/gommon/log"
 	"github.com/satori/go.uuid"
 )
 
@@ -15,6 +16,12 @@ type Server struct {
 func (s Server) Start() {
 	e := echo.New()
 	e.Use(middleware.Logger())
+	e.Logger.SetLevel(log.DEBUG)
+	e.Use(middleware.BodyDump(func(c echo.Context, reqBody, resBody []byte) {
+		if len(reqBody) > 0 {
+			e.Logger.Debug(string(reqBody))
+		}
+	}))
 
 	e.Use(middleware.BasicAuth(func(username, password string, c echo.Context) (bool, error) {
 		if username == "admin" && password == "admin" {
