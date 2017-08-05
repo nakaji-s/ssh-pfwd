@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+
+	"github.com/labstack/echo"
 )
 
 type Rule struct {
@@ -16,7 +18,7 @@ type Config interface {
 	AddRule(newRule Rule)
 	DeleteRule(id string) error
 	GetRule(id string) (Rule, error)
-	UpdateRule(id string, newRule Rule) (Rule, error)
+	UpdateRule(id string, c echo.Context) (Rule, error)
 	GetRules() []Rule
 }
 
@@ -53,11 +55,13 @@ func (c *InMemoryConfig) GetRule(id string) (Rule, error) {
 	return Rule{}, fmt.Errorf("err id(%s) not found", id)
 }
 
-func (c *InMemoryConfig) UpdateRule(id string, newRule Rule) (Rule, error) {
+func (c *InMemoryConfig) UpdateRule(id string, ctx echo.Context) (Rule, error) {
 	for i, _ := range c.Rules {
 		if c.Rules[i].Id == id {
-			c.Rules[i] = newRule
-			return newRule, nil
+			if err := ctx.Bind(&c.Rules[i]); err != nil {
+				return Rule{}, err
+			}
+			return c.Rules[i], nil
 		}
 	}
 	return Rule{}, fmt.Errorf("err id(%s) not found", id)

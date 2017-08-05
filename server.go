@@ -60,11 +60,7 @@ func (s Server) Start() {
 		return c.JSON(http.StatusOK, rule)
 	})
 	e.PUT("/rule/:id", func(c echo.Context) error {
-		rule := new(Rule)
-		if err := c.Bind(rule); err != nil {
-			return err
-		}
-		updatedRule, err := s.Config.UpdateRule(c.Param("id"), *rule)
+		updatedRule, err := s.Config.UpdateRule(c.Param("id"), c)
 		if err != nil {
 			return c.JSON(http.StatusNotFound, struct{}{})
 		}
