@@ -41,10 +41,15 @@ new Vue({
         },
         dialogFormVisibleClean() {
             Vue.set(this, "form", {})
+        },
+        handleSelect(key, keyPath) {
+            this.activeIndex = key
+            console.log(key, keyPath);
         }
     },
     data: function() {
         return {
+            activeIndex: '1',
             tableData: [],
             dialogFormVisible: false,
             dialogFormVisibleUpdate: false,

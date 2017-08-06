@@ -8,21 +8,22 @@
 <body>
 
 <div id="app">
-    <el-row>
-        <el-col :span="24">
-            <el-menu theme="dark" default-active="1" class="el-menu-demo" mode="horizontal">
-                <el-menu-item index="1">SSH PortForwarding rules</el-menu-item>
-                <el-menu-item index="2">Keys</el-menu-item>
-                <el-menu-item index="3">Traffic</el-menu-item>
-            </el-menu>
-        </el-col>
-    </el-row>
-
     <template>
+        <el-row>
+            <el-col :span="24">
+                <el-menu theme="dark" :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
+                    <el-menu-item index="1">SSH PortForwarding rules</el-menu-item>
+                    <el-menu-item index="2">Keys</el-menu-item>
+                    <el-menu-item index="3">Traffic</el-menu-item>
+                </el-menu>
+            </el-col>
+        </el-row>
+
         <el-table
                 :data="tableData"
                 border
-                style="width: 100%">
+                style="width: 100%"
+                v-if="activeIndex === '1'">
             <el-table-column
                     label=""
                     width="80">
@@ -66,7 +67,8 @@
     </template>
 
     <!-- Form -->
-    <el-button @click="dialogFormVisibleClean(); dialogFormVisible = true">Add New Rule</el-button>
+    <el-button v-if="activeIndex === '1'"
+               @click="dialogFormVisibleClean(); dialogFormVisible = true">Add New Rule</el-button>
 
     <el-dialog title="Portforwarding Rule" :visible.sync="dialogFormVisible">
         <el-form :model="form">
