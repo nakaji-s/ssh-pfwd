@@ -3,6 +3,7 @@ package main
 import (
 	"net/http"
 
+	"github.com/GeertJohan/go.rice"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	"github.com/labstack/gommon/log"
@@ -32,7 +33,8 @@ func (s Server) Start() {
 
 	e.File("/", "ssh-pfwd/static/index.html")
 	e.File("/app.js", "ssh-pfwd/static/app.js")
-	e.Static("/lib", "ssh-pfwd/static/lib")
+	assetHandler := http.FileServer(rice.MustFindBox("static/lib").HTTPBox())
+	e.GET("/lib/*", echo.WrapHandler(http.StripPrefix("/lib/", assetHandler)))
 
 	e.POST("/rule", func(c echo.Context) error {
 		rule := new(Rule)
