@@ -16,6 +16,7 @@ type SSHPortForward struct {
 	SshAddr    string
 	LocalAddr  string
 	RemoteAddr string
+	Connected  bool
 }
 
 // Get default location of a private key
@@ -96,6 +97,8 @@ func (s SSHPortForward) Handle() {
 		panic(err)
 	}
 	defer local.Close()
+
+	s.Connected = true
 
 	// Handle incoming connections
 	for {
