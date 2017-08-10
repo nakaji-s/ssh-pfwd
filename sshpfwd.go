@@ -17,6 +17,9 @@ type SSHPortForward struct {
 	LocalAddr  string
 	RemoteAddr string
 	Connected  bool
+	conn       *ssh.Client
+	local      net.Listener
+	done       chan bool
 }
 
 // Get default location of a private key
@@ -77,7 +80,15 @@ func handleClient(client net.Conn, remote net.Conn) {
 	<-chDone
 }
 
-func (s SSHPortForward) Handle() {
+func (s *SSHPortForward) Stop() {
+	if s.local != nil {
+		s.done <- true
+		s.local.Close()
+		s.conn.Close()
+	}
+}
+
+func (s *SSHPortForward) Start() {
 	// Build SSH client configuration
 	cfg, err := makeSshConfig(os.Getenv("USER"), "password")
 	if err != nil {
@@ -85,34 +96,40 @@ func (s SSHPortForward) Handle() {
 	}
 
 	// Establish connection with SSH server
-	conn, err := ssh.Dial("tcp", s.SshAddr, cfg)
+	s.conn, err = ssh.Dial("tcp", s.SshAddr, cfg)
 	if err != nil {
 		panic(err)
 	}
-	defer conn.Close()
 
 	// Start local server to forward traffic to remote connection
-	local, err := net.Listen("tcp", s.LocalAddr)
+	s.local, err = net.Listen("tcp", s.LocalAddr)
 	if err != nil {
 		panic(err)
 	}
-	defer local.Close()
 
 	s.Connected = true
+	s.done = make(chan bool, 1)
 
-	// Handle incoming connections
-	for {
-		client, err := local.Accept()
-		if err != nil {
-			panic(err)
+	go func() {
+		// Handle incoming connections
+		for {
+			client, err := s.local.Accept()
+			if err != nil {
+				select {
+				case <-s.done:
+					return
+				default:
+					panic(err)
+				}
+			}
+
+			// Establish connection with remote server
+			remote, err := s.conn.Dial("tcp", s.RemoteAddr)
+			if err != nil {
+				panic(err)
+			}
+
+			handleClient(client, remote)
 		}
-
-		// Establish connection with remote server
-		remote, err := conn.Dial("tcp", s.RemoteAddr)
-		if err != nil {
-			panic(err)
-		}
-
-		handleClient(client, remote)
-	}
+	}()
 }

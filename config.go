@@ -61,11 +61,10 @@ func (c *InMemoryConfig) UpdateRule(id string, ctx echo.Context) (Rule, error) {
 			if err := ctx.Bind(&c.Rules[i]); err != nil {
 				return Rule{}, err
 			}
-			//c.Rules[i].SSHPortForward.Stop()
+			// Reconnect
+			c.Rules[i].SSHPortForward.Stop()
 			if c.Rules[i].Enable == true {
-				go func() {
-					c.Rules[i].SSHPortForward.Handle()
-				}()
+				c.Rules[i].SSHPortForward.Start()
 			}
 			return c.Rules[i], nil
 		}
