@@ -26,8 +26,10 @@
                 v-if="activeIndex === '1'">
             <el-table-column
                     label=""
-                    width="80">
+                    width="120">
                 <template scope="scope">
+                    <span v-if="tableData[scope.$index].Connected === true">🔵</span>
+                    <span v-else>🔴</span>
                     <el-switch
                             v-model="tableData[scope.$index].Enable"
                             on-color="#13ce66"

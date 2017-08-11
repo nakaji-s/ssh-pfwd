@@ -81,6 +81,8 @@ func handleClient(client net.Conn, remote net.Conn) {
 }
 
 func (s *SSHPortForward) Stop() {
+	s.Connected = false
+
 	if s.local != nil {
 		s.done <- true
 		s.local.Close()
