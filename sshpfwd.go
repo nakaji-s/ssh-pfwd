@@ -10,12 +10,13 @@ import (
 	"strings"
 
 	"golang.org/x/crypto/ssh"
+	"gopkg.in/go-playground/validator.v9"
 )
 
 type SSHPortForward struct {
-	SshAddr    string
-	LocalAddr  string
-	RemoteAddr string
+	SshAddr    string `validate:"required"`
+	LocalAddr  string `validate:"required"`
+	RemoteAddr string `validate:"required"`
 	Connected  bool
 	conn       *ssh.Client
 	local      net.Listener
@@ -91,6 +92,13 @@ func (s *SSHPortForward) Stop() {
 }
 
 func (s *SSHPortForward) Start() {
+	// Validation
+	validate := validator.New()
+	err := validate.Struct(s)
+	if err != nil {
+		panic(err)
+	}
+
 	// Build SSH client configuration
 	cfg, err := makeSshConfig(os.Getenv("USER"), "password")
 	if err != nil {
