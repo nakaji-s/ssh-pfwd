@@ -7,7 +7,7 @@ import (
 )
 
 func TestAddRule(t *testing.T) {
-	config := Config{}
+	config := InMemoryConfig{}
 
 	r1 := Rule{Priority: 3}
 	r2 := Rule{Priority: 4}
