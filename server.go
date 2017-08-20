@@ -2,11 +2,17 @@ package main
 
 import (
 	"net/http"
+	"os"
+
+	"time"
+
+	"io"
 
 	"github.com/GeertJohan/go.rice"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	"github.com/labstack/gommon/log"
+	rotatelogs "github.com/lestrrat/go-file-rotatelogs"
 	"github.com/satori/go.uuid"
 )
 
@@ -16,7 +22,23 @@ type Server struct {
 
 func (s Server) Start() {
 	e := echo.New()
-	e.Use(middleware.Logger())
+
+	// log rotate settings
+	logf, err := rotatelogs.New(
+		"./access_log.%Y%m%d%H%M",
+		rotatelogs.WithLinkName("./access_log"),
+		rotatelogs.WithMaxAge(24*time.Hour),
+		rotatelogs.WithRotationTime(time.Hour),
+	)
+	if err != nil {
+		log.Printf("failed to create rotatelogs: %s", err)
+		return
+	}
+	// logging
+	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
+		// log to stdout and file
+		Output: io.MultiWriter(os.Stdout, logf),
+	}))
 	e.Logger.SetLevel(log.DEBUG)
 	e.Use(middleware.BodyDump(func(c echo.Context, reqBody, resBody []byte) {
 		if len(reqBody) > 0 {
