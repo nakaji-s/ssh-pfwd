@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 
+	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo"
 )
 
@@ -22,6 +23,7 @@ type Config interface {
 	GetRules() []Rule
 }
 
+// InMemory
 type InMemoryConfig struct {
 	Rules []Rule
 }
@@ -74,4 +76,50 @@ func (c *InMemoryConfig) UpdateRule(id string, ctx echo.Context) (Rule, error) {
 
 func (c *InMemoryConfig) GetRules() []Rule {
 	return c.Rules
+}
+
+// sqlite
+type SqliteConfig struct {
+	Db *gorm.DB
+}
+
+func (c *SqliteConfig) AddRule(newRule Rule) {
+	c.Db.Create(newRule)
+}
+
+func (c *SqliteConfig) DeleteRule(id string) error {
+	c.Db.Where("id = ?", id).Delete(&Rule{})
+
+	return nil
+}
+
+func (c *SqliteConfig) GetRule(id string) (Rule, error) {
+	var rule Rule
+	c.Db.Where("id = ?", id).First(&rule)
+
+	return rule, nil
+}
+
+func (c *SqliteConfig) UpdateRule(id string, ctx echo.Context) (Rule, error) {
+	var rule Rule
+	c.Db.Where("id = ?", id).First(&rule)
+
+	if err := ctx.Bind(&rule); err != nil {
+		return Rule{}, err
+	}
+	// Reconnect
+	rule.SSHPortForward.Stop()
+	if rule.Enable == true {
+		rule.SSHPortForward.Start()
+	}
+
+	c.Db.Model(&rule).Where("id = ?", id).Update(&rule)
+
+	return rule, nil
+}
+
+func (c *SqliteConfig) GetRules() []Rule {
+	var rules []Rule
+	c.Db.Find(&rules)
+	return rules
 }
