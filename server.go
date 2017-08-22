@@ -9,6 +9,7 @@ import (
 	"io"
 
 	"github.com/GeertJohan/go.rice"
+	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	"github.com/labstack/gommon/log"
@@ -64,29 +65,36 @@ func (s Server) Start() {
 			return err
 		}
 		rule.Id = uuid.NewV4().String()
-		s.Config.AddRule(*rule)
+		err := s.Config.AddRule(*rule)
+		if err != nil {
+			return handleError(c, err)
+		}
 		return c.JSON(http.StatusCreated, rule)
 	})
 	e.GET("/rules", func(c echo.Context) error {
-		return c.JSON(http.StatusOK, s.Config.GetRules())
+		rules, err := s.Config.GetRules()
+		if err != nil {
+			return handleError(c, err)
+		}
+		return c.JSON(http.StatusOK, rules)
 	})
 	e.DELETE("/rule/:id", func(c echo.Context) error {
 		if err := s.Config.DeleteRule(c.Param("id")); err != nil {
-			return c.JSON(http.StatusNotFound, struct{}{})
+			return handleError(c, err)
 		}
 		return c.JSON(http.StatusOK, struct{}{})
 	})
 	e.GET("/rule/:id", func(c echo.Context) error {
 		rule, err := s.Config.GetRule(c.Param("id"))
 		if err != nil {
-			return c.JSON(http.StatusNotFound, struct{}{})
+			return handleError(c, err)
 		}
 		return c.JSON(http.StatusOK, rule)
 	})
 	e.PUT("/rule/:id", func(c echo.Context) error {
 		updatedRule, err := s.Config.UpdateRule(c.Param("id"), c)
 		if err != nil {
-			return c.JSON(http.StatusNotFound, struct{}{})
+			return handleError(c, err)
 		}
 		return c.JSON(http.StatusOK, updatedRule)
 	})
@@ -94,4 +102,13 @@ func (s Server) Start() {
 	// TODO CRUD for key
 
 	e.Logger.Fatal(e.Start("127.0.0.1:8080"))
+}
+
+func handleError(c echo.Context, err error) error {
+	switch err {
+	case gorm.ErrRecordNotFound, ErrIdNotFound:
+		return c.JSON(http.StatusNotFound, struct{}{})
+	default:
+		return err
+	}
 }

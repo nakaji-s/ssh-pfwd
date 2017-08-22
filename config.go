@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"errors"
 
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo"
@@ -16,11 +16,11 @@ type Rule struct {
 }
 
 type Config interface {
-	AddRule(newRule Rule)
+	AddRule(newRule Rule) error
 	DeleteRule(id string) error
 	GetRule(id string) (Rule, error)
 	UpdateRule(id string, c echo.Context) (Rule, error)
-	GetRules() []Rule
+	GetRules() ([]Rule, error)
 }
 
 // InMemory
@@ -28,14 +28,17 @@ type InMemoryConfig struct {
 	Rules []Rule
 }
 
-func (c *InMemoryConfig) AddRule(newRule Rule) {
+var ErrIdNotFound = errors.New("id not found")
+
+func (c *InMemoryConfig) AddRule(newRule Rule) error {
 	for i, rule := range c.Rules {
 		if rule.Priority > newRule.Priority {
 			c.Rules = append(c.Rules[:i], append([]Rule{newRule}, c.Rules[i:]...)...)
-			return
+			return nil
 		}
 	}
 	c.Rules = append(c.Rules, newRule)
+	return nil
 }
 
 func (c *InMemoryConfig) DeleteRule(id string) error {
@@ -45,7 +48,7 @@ func (c *InMemoryConfig) DeleteRule(id string) error {
 			return nil
 		}
 	}
-	return fmt.Errorf("err id(%s) not found", id)
+	return ErrIdNotFound
 }
 
 func (c *InMemoryConfig) GetRule(id string) (Rule, error) {
@@ -54,7 +57,7 @@ func (c *InMemoryConfig) GetRule(id string) (Rule, error) {
 			return rule, nil
 		}
 	}
-	return Rule{}, fmt.Errorf("err id(%s) not found", id)
+	return Rule{}, ErrIdNotFound
 }
 
 func (c *InMemoryConfig) UpdateRule(id string, ctx echo.Context) (Rule, error) {
@@ -71,11 +74,11 @@ func (c *InMemoryConfig) UpdateRule(id string, ctx echo.Context) (Rule, error) {
 			return c.Rules[i], nil
 		}
 	}
-	return Rule{}, fmt.Errorf("err id(%s) not found", id)
+	return Rule{}, ErrIdNotFound
 }
 
-func (c *InMemoryConfig) GetRules() []Rule {
-	return c.Rules
+func (c *InMemoryConfig) GetRules() ([]Rule, error) {
+	return c.Rules, nil
 }
 
 // sqlite
@@ -83,8 +86,8 @@ type SqliteConfig struct {
 	Db *gorm.DB
 }
 
-func (c *SqliteConfig) AddRule(newRule Rule) {
-	c.Db.Create(newRule)
+func (c *SqliteConfig) AddRule(newRule Rule) error {
+	return c.Db.Create(newRule).Error
 }
 
 func (c *SqliteConfig) DeleteRule(id string) error {
@@ -119,8 +122,8 @@ func (c *SqliteConfig) UpdateRule(id string, ctx echo.Context) (Rule, error) {
 	return rule, err
 }
 
-func (c *SqliteConfig) GetRules() []Rule {
+func (c *SqliteConfig) GetRules() ([]Rule, error) {
 	var rules []Rule
-	c.Db.Find(&rules)
-	return rules
+	err := c.Db.Find(&rules).Error
+	return rules, err
 }
