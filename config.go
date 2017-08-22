@@ -88,23 +88,24 @@ func (c *SqliteConfig) AddRule(newRule Rule) {
 }
 
 func (c *SqliteConfig) DeleteRule(id string) error {
-	c.Db.Where("id = ?", id).Delete(&Rule{})
-
-	return nil
+	return c.Db.Where("id = ?", id).Delete(&Rule{}).Error
 }
 
 func (c *SqliteConfig) GetRule(id string) (Rule, error) {
 	var rule Rule
-	c.Db.Where("id = ?", id).First(&rule)
+	err := c.Db.Where("id = ?", id).First(&rule).Error
 
-	return rule, nil
+	return rule, err
 }
 
 func (c *SqliteConfig) UpdateRule(id string, ctx echo.Context) (Rule, error) {
 	var rule Rule
-	c.Db.Where("id = ?", id).First(&rule)
+	err := c.Db.Where("id = ?", id).First(&rule).Error
+	if err != nil {
+		return Rule{}, err
+	}
 
-	if err := ctx.Bind(&rule); err != nil {
+	if err = ctx.Bind(&rule); err != nil {
 		return Rule{}, err
 	}
 	// Reconnect
@@ -113,9 +114,9 @@ func (c *SqliteConfig) UpdateRule(id string, ctx echo.Context) (Rule, error) {
 		rule.SSHPortForward.Start()
 	}
 
-	c.Db.Model(&rule).Where("id = ?", id).Update(&rule)
+	err = c.Db.Model(&rule).Where("id = ?", id).Update(&rule).Error
 
-	return rule, nil
+	return rule, err
 }
 
 func (c *SqliteConfig) GetRules() []Rule {
