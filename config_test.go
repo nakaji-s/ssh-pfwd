@@ -5,8 +5,6 @@ import (
 
 	"reflect"
 
-	"fmt"
-
 	mocket "github.com/Selvatico/go-mocket"
 	"github.com/jinzhu/gorm"
 	"github.com/stretchr/testify/assert"

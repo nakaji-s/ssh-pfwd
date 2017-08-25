@@ -5,6 +5,7 @@ import (
 
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo"
+	"gopkg.in/go-playground/validator.v9"
 )
 
 type Rule struct {
@@ -87,6 +88,13 @@ type SqliteConfig struct {
 }
 
 func (c *SqliteConfig) AddRule(newRule Rule) error {
+	// Validation
+	validate := validator.New()
+	err := validate.Struct(newRule)
+	if err != nil {
+		return err
+	}
+
 	return c.Db.Create(newRule).Error
 }
 
@@ -111,6 +119,14 @@ func (c *SqliteConfig) UpdateRule(id string, ctx echo.Context) (Rule, error) {
 	if err = ctx.Bind(&rule); err != nil {
 		return Rule{}, err
 	}
+
+	// Validation
+	validate := validator.New()
+	err = validate.Struct(rule)
+	if err != nil {
+		return Rule{}, err
+	}
+
 	// Reconnect
 	rule.SSHPortForward.Stop()
 	if rule.Enable == true {
