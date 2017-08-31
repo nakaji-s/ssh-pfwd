@@ -54,6 +54,15 @@ func (s Server) Start() {
 		return false, nil
 	}))
 
+	// Set ResponseHeader
+	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			// Set no-cache
+			c.Response().Header().Set("Cache-Control", "no-cache")
+			return next(c)
+		}
+	})
+
 	e.File("/", "ssh-pfwd/static/index.html")
 	e.File("/app.js", "ssh-pfwd/static/app.js")
 	assetHandler := http.FileServer(rice.MustFindBox("static/lib").HTTPBox())
